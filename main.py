@@ -11,7 +11,7 @@ NOMBRE_ARCHIVO = "reporte_monitorizacion.csv"
 # Crear archivo CSV y escribir encabezados
 with open(NOMBRE_ARCHIVO, mode='w', newline='') as archivo:
     escritor = csv.writer(archivo)
-    escritor.writerow(["Timestamp", "CPU (%)", "RAM (%)", "Disco (%)", "Red Enviados (KB)", "Red Recibidos (KB)"])
+    escritor.writerow(["Timestamp", "CPU (%)", "RAM (%)", "Disco (%)", "Red Enviados (KB)", "Red Recibidos (KB)", "Temp CPU (°C)"])
 
 # Registro de datos
 inicio = time.time()
@@ -24,6 +24,7 @@ while time.time() - inicio < DURACION_MONITOREO:
     memory = psutil.virtual_memory()
     disk = psutil.disk_usage('/')
     net = psutil.net_io_counters()
+    temp_cpu = psutil.sensors_temperatures().get('coretemp', [])[0].current if psutil.sensors_temperatures() else 'N/A'
 
     # Conversión de datos
     ram_percent = memory.percent
@@ -34,6 +35,6 @@ while time.time() - inicio < DURACION_MONITOREO:
     # Escribir datos en el archivo CSV
     with open(NOMBRE_ARCHIVO, mode='a', newline='') as archivo:
         escritor = csv.writer(archivo)
-        escritor.writerow([timestamp, cpu_percent, ram_percent, disk_percent, net_sent_kb, net_recv_kb])
+        escritor.writerow([timestamp, cpu_percent, ram_percent, disk_percent, net_sent_kb, net_recv_kb, temp_cpu])
 
 print(f"Monitoreo finalizado. Informe guardado en {NOMBRE_ARCHIVO}")
